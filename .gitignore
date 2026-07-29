@@ -1,0 +1,29 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Raw downloaded databases and private/source data are not committed.
+data/
+
+# Generated project artifacts: reference tables, KGs, food cards, embeddings,
+# visualizations, validation reports, and TRE transfer outputs.
+outputs/
+
+# Local smoke-test outputs from TRE-side notebooks/modules.
+downstream_analysis/test_outputs/
+downstream_analysis/outputs/
+
+# Generated OpenAI API outputs can be regenerated and may contain paid-run
+# artifacts. Remove this line if you intentionally want to version them.
+outputs/openai/
+
+# Local secrets and environment files.
+.env
+.env.*
+*.key
+openai_api_key*
+
+# Local conflict/backup files.
+*-LM009913.py
