@@ -9,7 +9,10 @@ data/
 
 # Generated project artifacts: reference tables, KGs, food cards, embeddings,
 # visualizations, validation reports, and TRE transfer outputs.
-outputs/
+outputs/**
+!outputs/
+!outputs/**/
+!outputs/**/.gitkeep
 
 # Local smoke-test outputs from TRE-side notebooks/modules.
 downstream_analysis/test_outputs/
