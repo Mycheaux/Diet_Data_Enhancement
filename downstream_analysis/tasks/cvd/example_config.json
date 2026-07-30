@@ -1,0 +1,36 @@
+{
+  "diet_events_path": "tre_inputs/diet_logging_events.parquet",
+  "cvd_targets_path": "tre_inputs/blood_tests.parquet",
+  "output_dir": "downstream_analysis/tasks/cvd/outputs",
+  "id_col": "participant_id",
+  "food_col": "food_id",
+  "ref_food_col": "hpp_food_id",
+  "grams_col": "weight_g",
+  "time_col": "collection_timestamp",
+  "y_time_col": "time_window",
+  "target_time_col": "collection_date",
+  "window": "participant",
+  "task_type": "continuous",
+  "models": [
+    "ridge",
+    "lasso",
+    "rf_regression"
+  ],
+  "n_splits": 5,
+  "test_size": 0.2,
+  "strict_targets": false,
+  "targets": [
+    "bt__triglycerides_float_value",
+    "bt__total_cholesterol_float_value",
+    "bt__hdl_cholesterol_float_value",
+    "bt__ldl_cholesterol_float_value",
+    "bt__non_hdl_cholesterol_float_value",
+    "bt__glucose_float_value",
+    "bt__hba1c_float_value",
+    "bt__creatinine_float_value",
+    "bt__urate_float_value",
+    "bt__alt_float_value",
+    "bt__ast_float_value",
+    "bt__ggt_float_value"
+  ]
+}

@@ -194,22 +194,22 @@ and can optionally include `collection_timestamp`, `local_timestamp`, or
 (`hpp_food_id`, `grams_consumed`, and `timestamp`) and can join TRE `food_id`
 events to exported food-reference tables keyed by `hpp_food_id`.
 
-The notebooks support:
+The downstream task workflows support:
 
 - enriched per-100 g food features;
 - food-card embedding vectors;
 - KG/downstream feature exports.
 
-Use:
+Launch the local dashboard:
 
-```text
-downstream_analysis/preprocess.ipynb
-downstream_analysis/supervised_prediction.ipynb
+```bash
+python -m downstream_analysis.app --project-root .
 ```
 
-Most logic is kept in `downstream_analysis/preprocess.py` and
-`downstream_analysis/modeling.py` so future TRE notebooks can reuse the same
-alignment, aggregation, cross-validation, and metric code.
+Task-specific runners live under `downstream_analysis/tasks/`. Shared
+preprocessing, aggregation, cross-validation, and metric code lives under
+`downstream_analysis/utils/`. Earlier notebook wrappers were moved to
+`depricated/downstream_analysis/` with a migration record.
 
 ## Current Branch Sizes
 

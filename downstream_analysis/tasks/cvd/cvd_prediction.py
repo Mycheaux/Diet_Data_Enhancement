@@ -1,17 +1,17 @@
-"""Microbiome prediction comparison for TRE-side analyses.
+"""Cardiovascular biomarker prediction comparison for TRE-side analyses.
 
 This task builds participant/time-window diet design matrices for four feature
-sets and evaluates the same microbiome targets against each one:
+sets and evaluates the same cardiovascular/cardiometabolic biomarker targets
+against each one:
 
-1. full_data: KG/downstream feature export, intended to include nutrient,
-   product, chemical, metabolite, disease, and pathway features.
+1. full_data: KG/downstream cardiometabolic feature export.
 2. enriched_data: de novo enriched HPP per-100 g food features.
 3. nutrimatch_only: NutriMatch-based per-100 g nutrient features.
 4. food_card_embedding: food-card text embedding vectors aggregated by intake.
 
-The microbiome target table is expected to be wide: one row per participant or
-participant/time window and one or more numeric microbiome targets, such as URS
-or MetaPhlAn abundance columns.
+The target table is expected to be wide: one row per participant or
+participant/time window and numeric biomarker columns such as triglycerides,
+cholesterol fractions, glucose, HbA1C, liver enzymes, creatinine, and urate.
 """
 
 from __future__ import annotations
@@ -28,6 +28,22 @@ from downstream_analysis.utils.modeling import run_prediction_from_files
 from downstream_analysis.utils.preprocess import add_time_window, build_design_matrix, read_table, write_table
 
 
+APPROVED_CVD_TARGETS = [
+    "bt__triglycerides_float_value",
+    "bt__total_cholesterol_float_value",
+    "bt__hdl_cholesterol_float_value",
+    "bt__ldl_cholesterol_float_value",
+    "bt__non_hdl_cholesterol_float_value",
+    "bt__glucose_float_value",
+    "bt__hba1c_float_value",
+    "bt__creatinine_float_value",
+    "bt__urate_float_value",
+    "bt__alt_float_value",
+    "bt__ast_float_value",
+    "bt__ggt_float_value",
+]
+
+
 @dataclass(frozen=True)
 class FeatureSet:
     name: str
@@ -37,13 +53,13 @@ class FeatureSet:
 
 
 def default_feature_sets(project_root: Path) -> list[FeatureSet]:
-    """Return the four planned microbiome comparison inputs."""
+    """Return the four planned CVD comparison inputs."""
     return [
         FeatureSet(
             name="full_data",
-            path=project_root / "outputs" / "downstream_features" / "denovo" / "microbiome" / "hpp_downstream_feature_table.csv",
+            path=project_root / "outputs" / "downstream_features" / "denovo" / "cardiometabolic" / "hpp_downstream_feature_table.csv",
             feature_mode="kg",
-            description="Full KG/downstream microbiome feature export.",
+            description="Full KG/downstream cardiometabolic feature export.",
         ),
         FeatureSet(
             name="enriched_data",
@@ -78,10 +94,11 @@ def load_feature_sets(config: dict[str, Any], project_root: Path) -> list[Featur
         return default_feature_sets(project_root)
     out: list[FeatureSet] = []
     for item in custom:
+        item_path = Path(item["path"])
         out.append(
             FeatureSet(
                 name=item["name"],
-                path=(project_root / item["path"]).resolve() if not Path(item["path"]).is_absolute() else Path(item["path"]),
+                path=(project_root / item_path).resolve() if not item_path.is_absolute() else item_path,
                 feature_mode=item.get("feature_mode", "enriched"),
                 description=item.get("description", ""),
             )
@@ -89,78 +106,63 @@ def load_feature_sets(config: dict[str, Any], project_root: Path) -> list[Featur
     return out
 
 
-def infer_microbiome_targets(
-    microbiome_table: pd.DataFrame,
+def select_cvd_targets(
+    target_table: pd.DataFrame,
     id_col: str = "participant_id",
     time_col: str | None = "time_window",
     requested_targets: list[str] | None = None,
-    max_targets: int | None = None,
-) -> list[str]:
-    """Select numeric microbiome target columns from a wide target table."""
-    if requested_targets:
-        missing = [target for target in requested_targets if target not in microbiome_table.columns]
-        if missing:
-            raise ValueError(f"Requested target columns are missing from microbiome table: {missing}")
-        return requested_targets
+    strict_targets: bool = False,
+) -> tuple[list[str], list[str]]:
+    """Select approved numeric CVD targets from a wide target table."""
+    wanted = requested_targets or APPROVED_CVD_TARGETS
+    missing = [target for target in wanted if target not in target_table.columns]
+    if missing and strict_targets:
+        raise ValueError(f"Requested CVD target columns are missing: {missing}")
     exclude = {id_col}
     if time_col:
         exclude.add(time_col)
-    metadata_like = {
-        "collection_timestamp",
-        "collection_date",
-        "timezone",
-        "sample_name",
-        "run_name",
-        "wgs_dna_code",
-    }
-    exclude.update(metadata_like)
-    targets = [
-        col
-        for col in microbiome_table.select_dtypes(include="number").columns
-        if col not in exclude
+    selected = [
+        target
+        for target in wanted
+        if target in target_table.columns and pd.api.types.is_numeric_dtype(target_table[target]) and target not in exclude
     ]
-    if max_targets is not None:
-        targets = targets[:max_targets]
-    if not targets:
-        raise ValueError("No numeric microbiome targets found. Pass explicit target columns in the config.")
-    return targets
+    if not selected:
+        raise ValueError("No approved numeric CVD targets found in the target table.")
+    return selected, missing
 
 
-def normalize_microbiome_targets(
-    microbiome_targets_path: str | Path,
+def normalize_cvd_targets(
+    cvd_targets_path: str | Path,
     output_path: str | Path,
     id_col: str = "participant_id",
     time_col: str | None = "time_window",
-    target_time_col: str | None = "collection_timestamp",
+    target_time_col: str | None = "collection_date",
     window: str = "participant",
     targets: list[str] | None = None,
-    max_targets: int | None = None,
-) -> tuple[Path, list[str]]:
-    """Copy selected target columns to a modeling-ready target table."""
-    y = read_table(microbiome_targets_path)
+    strict_targets: bool = False,
+) -> tuple[Path, list[str], list[str]]:
+    """Copy selected biomarker target columns to a modeling-ready table."""
+    y = read_table(cvd_targets_path)
     if time_col and time_col not in y.columns:
         y = add_time_window(y, time_col=target_time_col, window=window)
-    selected = infer_microbiome_targets(
+    selected, missing = select_cvd_targets(
         y,
         id_col=id_col,
         time_col=time_col,
         requested_targets=targets,
-        max_targets=max_targets,
+        strict_targets=strict_targets,
     )
     keep = [id_col]
     if time_col and time_col in y.columns:
         keep.append(time_col)
     keep.extend(selected)
     output_path = write_table(y[keep], output_path)
-    return output_path, selected
+    return output_path, selected, missing
 
 
-def run_microbiome_comparison(
-    config: dict[str, Any],
-    project_root: Path,
-) -> dict[str, Any]:
-    """Build X tables and run all configured microbiome prediction comparisons."""
-    output_dir = Path(config.get("output_dir", project_root / "downstream_analysis" / "tasks" / "microbiome_prediction" / "outputs"))
+def run_cvd_comparison(config: dict[str, Any], project_root: Path) -> dict[str, Any]:
+    """Build X tables and run all configured CVD biomarker comparisons."""
+    output_dir = Path(config.get("output_dir", project_root / "downstream_analysis" / "tasks" / "cvd" / "outputs"))
     if not output_dir.is_absolute():
         output_dir = project_root / output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -171,25 +173,25 @@ def run_microbiome_comparison(
     grams_col = config.get("grams_col", "weight_g")
     time_col = config.get("time_col", "collection_timestamp")
     y_time_col = config.get("y_time_col", "time_window")
-    target_time_col = config.get("target_time_col", "collection_timestamp")
+    target_time_col = config.get("target_time_col", "collection_date")
     window = config.get("window", "participant")
 
     diet_events_path = Path(config["diet_events_path"])
-    microbiome_targets_path = Path(config["microbiome_targets_path"])
+    cvd_targets_path = Path(config["cvd_targets_path"])
     if not diet_events_path.is_absolute():
         diet_events_path = project_root / diet_events_path
-    if not microbiome_targets_path.is_absolute():
-        microbiome_targets_path = project_root / microbiome_targets_path
+    if not cvd_targets_path.is_absolute():
+        cvd_targets_path = project_root / cvd_targets_path
 
-    target_table_path, targets = normalize_microbiome_targets(
-        microbiome_targets_path=microbiome_targets_path,
-        output_path=output_dir / "microbiome_targets_selected.parquet",
+    target_table_path, targets, missing_targets = normalize_cvd_targets(
+        cvd_targets_path=cvd_targets_path,
+        output_path=output_dir / "cvd_targets_selected.parquet",
         id_col=id_col,
         time_col=y_time_col,
         target_time_col=target_time_col,
         window=window,
         targets=config.get("targets"),
-        max_targets=config.get("max_targets"),
+        strict_targets=bool(config.get("strict_targets", False)),
     )
 
     task_type = config.get("task_type", "continuous")
@@ -215,13 +217,7 @@ def run_microbiome_comparison(
             time_col=time_col,
             window=window,
         )
-        feature_summaries.append(
-            {
-                "feature_set": feature_set.name,
-                "description": feature_set.description,
-                **feature_summary,
-            }
-        )
+        feature_summaries.append({"feature_set": feature_set.name, "description": feature_set.description, **feature_summary})
         for target in targets:
             target_dir = feature_output_dir / "predictions" / target
             run_summary = run_prediction_from_files(
@@ -250,28 +246,28 @@ def run_microbiome_comparison(
                 )
                 comparison_rows.append(row_dict)
 
-    comparison = pd.DataFrame(comparison_rows)
-    comparison_path = output_dir / "microbiome_feature_set_comparison.csv"
-    write_table(comparison, comparison_path)
+    comparison_path = output_dir / "cvd_feature_set_comparison.csv"
+    write_table(pd.DataFrame(comparison_rows), comparison_path)
     feature_summary_path = output_dir / "feature_set_build_summaries.csv"
     write_table(pd.DataFrame(feature_summaries), feature_summary_path)
     run_summary = {
         "diet_events_path": str(diet_events_path),
-        "microbiome_targets_path": str(microbiome_targets_path),
+        "cvd_targets_path": str(cvd_targets_path),
         "selected_target_table": str(target_table_path),
         "targets": targets,
+        "missing_targets": missing_targets,
         "feature_sets": [fs.name for fs in load_feature_sets(config, project_root)],
         "comparison_path": str(comparison_path),
         "feature_summary_path": str(feature_summary_path),
         "output_dir": str(output_dir),
     }
-    (output_dir / "microbiome_prediction_run_summary.json").write_text(json.dumps(run_summary, indent=2), encoding="utf-8")
+    (output_dir / "cvd_prediction_run_summary.json").write_text(json.dumps(run_summary, indent=2), encoding="utf-8")
     return run_summary
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run microbiome prediction feature-set comparison.")
-    parser.add_argument("--config", required=True, help="Path to microbiome prediction JSON config.")
+    parser = argparse.ArgumentParser(description="Run CVD biomarker prediction feature-set comparison.")
+    parser.add_argument("--config", required=True, help="Path to CVD prediction JSON config.")
     parser.add_argument("--project-root", default=".", help="Project root containing downstream_analysis and outputs.")
     return parser.parse_args()
 
@@ -283,7 +279,7 @@ def main() -> None:
     if not config_path.is_absolute():
         config_path = project_root / config_path
     config = json.loads(config_path.read_text(encoding="utf-8"))
-    summary = run_microbiome_comparison(config=config, project_root=project_root)
+    summary = run_cvd_comparison(config=config, project_root=project_root)
     print(json.dumps(summary, indent=2))
 
 

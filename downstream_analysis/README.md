@@ -1,21 +1,24 @@
 # Downstream Analysis TRE Scaffold
 
-This folder contains code and notebooks intended to be copied or run inside TRE.
+This folder contains task runners, a dashboard app, and shared utilities
+intended to be copied or run inside TRE.
 It does not require participant data outside TRE.
 
 ## Files
 
-- `preprocess.py`: joins participant diet logs to HPP food-level feature tables,
+- `app.py`: launches a small local dashboard for running tasks and viewing
+  comparison outputs.
+- `utils/preprocess.py`: joins participant diet logs to HPP food-level feature tables,
   food-card embeddings, or KG-derived feature tables, then aggregates to
   participant/time-window design matrices.
-- `modeling.py`: aligns `X` and `Y`, runs five repeated 80/20 train-test splits,
+- `utils/modeling.py`: aligns `X` and `Y`, runs five repeated 80/20 train-test splits,
   trains simple scikit-learn models, and reports classification or regression
   metrics.
-- `preprocess.ipynb`: notebook wrapper for preprocessing.
-- `supervised_prediction.ipynb`: notebook wrapper for prediction.
 - `tasks/microbiome_prediction/`: task-specific workflow comparing full
   KG/downstream features, de novo enriched features, NutriMatch-only nutrient
   features, and food-card embedding features for microbiome targets.
+- `tasks/cvd/`: task-specific workflow comparing the same four diet
+  representations for cardiovascular and cardiometabolic blood biomarkers.
 
 ## Expected TRE Diet Log Shape
 
@@ -32,8 +35,8 @@ collection_timestamp | local_timestamp | collection_date
 ```
 
 The preprocessing code also accepts the older local aliases
-`hpp_food_id`, `grams_consumed`, and `timestamp`. This lets the same notebooks
-run against TRE diet logs while still joining to exported food-reference tables
+`hpp_food_id`, `grams_consumed`, and `timestamp`. This lets the same task
+runners work against TRE diet logs while still joining to exported food-reference tables
 whose food identifier is usually `hpp_food_id`.
 
 ## Feature Inputs
@@ -48,10 +51,24 @@ outputs/food_card/denovo/embeddings/hpp_food_card_embeddings_full_biology_text_t
 
 ## Task Workflows
 
+Dashboard:
+
+```bash
+python -m downstream_analysis.app --project-root .
+```
+
 Microbiome prediction:
 
 ```bash
 python -m downstream_analysis.tasks.microbiome_prediction.microbiome_prediction \
   --config downstream_analysis/tasks/microbiome_prediction/example_config.json \
+  --project-root .
+```
+
+CVD and cardiometabolic biomarker prediction:
+
+```bash
+python -m downstream_analysis.tasks.cvd.cvd_prediction \
+  --config downstream_analysis/tasks/cvd/example_config.json \
   --project-root .
 ```
