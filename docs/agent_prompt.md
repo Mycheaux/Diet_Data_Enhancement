@@ -542,7 +542,7 @@ In docs and notebooks, explain:
 
 - Nutrients are per-100 g food-reference values.
 - Diet event amount:
-  event_amount = reference_per_100g * grams_consumed / 100
+  event_amount = reference_per_100g * weight_g / 100
 - Product, chemical, metabolite, disease, pathway, and KG features are
   annotation/exposure features unless explicitly measured as quantities.
 - Participant-level features inside TRE should be created by joining the HPP
@@ -587,4 +587,3 @@ After implementation, confirm:
 9. Optional OpenAI embedding command prompts for an API key and does not save it.
 10. The project can be reproduced from command-line pipeline commands.
 ```
-

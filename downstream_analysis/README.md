@@ -13,23 +13,28 @@ It does not require participant data outside TRE.
   metrics.
 - `preprocess.ipynb`: notebook wrapper for preprocessing.
 - `supervised_prediction.ipynb`: notebook wrapper for prediction.
+- `tasks/microbiome_prediction/`: task-specific workflow comparing full
+  KG/downstream features, de novo enriched features, NutriMatch-only nutrient
+  features, and food-card embedding features for microbiome targets.
 
 ## Expected TRE Diet Log Shape
 
-At minimum:
+The legacy HPP/TRE diet logging dictionary uses:
 
 ```text
-participant_id | hpp_food_id | grams_consumed
+participant_id | food_id | weight_g
 ```
 
 Optional:
 
 ```text
-timestamp
+collection_timestamp | local_timestamp | collection_date
 ```
 
-If `timestamp` is available, outputs can be made per day, week, month, year, or
-overall participant.
+The preprocessing code also accepts the older local aliases
+`hpp_food_id`, `grams_consumed`, and `timestamp`. This lets the same notebooks
+run against TRE diet logs while still joining to exported food-reference tables
+whose food identifier is usually `hpp_food_id`.
 
 ## Feature Inputs
 
@@ -41,3 +46,12 @@ outputs/downstream_features/denovo/broad_diet_health/hpp_downstream_feature_tabl
 outputs/food_card/denovo/embeddings/hpp_food_card_embeddings_full_biology_text_text_embedding_3_large.parquet
 ```
 
+## Task Workflows
+
+Microbiome prediction:
+
+```bash
+python -m downstream_analysis.tasks.microbiome_prediction.microbiome_prediction \
+  --config downstream_analysis/tasks/microbiome_prediction/example_config.json \
+  --project-root .
+```

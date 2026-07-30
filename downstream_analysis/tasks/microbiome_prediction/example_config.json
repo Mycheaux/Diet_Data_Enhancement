@@ -1,0 +1,22 @@
+{
+  "diet_events_path": "tre_inputs/diet_logging_events.parquet",
+  "microbiome_targets_path": "tre_inputs/microbiome_targets.parquet",
+  "output_dir": "downstream_analysis/tasks/microbiome_prediction/outputs",
+  "id_col": "participant_id",
+  "food_col": "food_id",
+  "ref_food_col": "hpp_food_id",
+  "grams_col": "weight_g",
+  "time_col": "collection_timestamp",
+  "y_time_col": "time_window",
+  "target_time_col": "collection_timestamp",
+  "window": "participant",
+  "task_type": "continuous",
+  "models": [
+    "ridge",
+    "lasso",
+    "rf_regression"
+  ],
+  "n_splits": 5,
+  "test_size": 0.2,
+  "max_targets": 20
+}

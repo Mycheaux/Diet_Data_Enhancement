@@ -15,9 +15,15 @@ import pandas as pd
 
 
 ID_COL_DEFAULT = "participant_id"
-FOOD_COL_DEFAULT = "hpp_food_id"
-GRAMS_COL_DEFAULT = "grams_consumed"
-TIME_COL_DEFAULT = "timestamp"
+FOOD_COL_DEFAULT = "food_id"
+REF_FOOD_COL_DEFAULT = "hpp_food_id"
+GRAMS_COL_DEFAULT = "weight_g"
+TIME_COL_DEFAULT = "collection_timestamp"
+
+ID_COL_ALIASES = ("participant_id", "research_stage_id", "user_id", "RegistrationCode")
+FOOD_COL_ALIASES = ("food_id", "hpp_food_id")
+GRAMS_COL_ALIASES = ("weight_g", "grams_consumed", "amount_g")
+TIME_COL_ALIASES = ("collection_timestamp", "local_timestamp", "collection_date", "timestamp")
 
 
 def read_table(path: str | Path) -> pd.DataFrame:
@@ -45,6 +51,18 @@ def infer_feature_columns(df: pd.DataFrame, exclude: Iterable[str]) -> list[str]
     exclude = set(exclude)
     numeric = df.select_dtypes(include=[np.number]).columns
     return [col for col in numeric if col not in exclude]
+
+
+def resolve_column(df: pd.DataFrame, requested: str | None, aliases: Iterable[str], role: str) -> str | None:
+    """Return the requested column if present, otherwise the first available alias."""
+    if requested is None:
+        return None
+    if requested in df.columns:
+        return requested
+    for alias in aliases:
+        if alias in df.columns:
+            return alias
+    raise ValueError(f"Missing {role} column. Requested {requested!r}; tried aliases: {list(aliases)}")
 
 
 def add_time_window(
@@ -78,6 +96,7 @@ def aggregate_food_features(
     feature_cols: list[str] | None = None,
     id_col: str = ID_COL_DEFAULT,
     food_col: str = FOOD_COL_DEFAULT,
+    ref_food_col: str = REF_FOOD_COL_DEFAULT,
     grams_col: str = GRAMS_COL_DEFAULT,
     time_col: str | None = TIME_COL_DEFAULT,
     window: str = "participant",
@@ -89,20 +108,20 @@ def aggregate_food_features(
     `amount_scaling='per_100g'` uses event exposure = food_feature * grams / 100.
     `amount_scaling='weighted_mean'` uses grams-weighted mean feature values.
     """
-    if id_col not in diet_events.columns:
-        raise ValueError(f"Missing participant id column: {id_col}")
-    if food_col not in diet_events.columns or food_col not in food_features.columns:
-        raise ValueError(f"Food id column {food_col!r} must exist in both tables.")
-    if grams_col not in diet_events.columns:
-        raise ValueError(f"Missing grams column: {grams_col}")
+    id_col = resolve_column(diet_events, id_col, ID_COL_ALIASES, "participant id")
+    food_col = resolve_column(diet_events, food_col, FOOD_COL_ALIASES, "diet food id")
+    ref_food_col = resolve_column(food_features, ref_food_col, FOOD_COL_ALIASES, "reference food id")
+    grams_col = resolve_column(diet_events, grams_col, GRAMS_COL_ALIASES, "consumed grams")
+    time_col = resolve_column(diet_events, time_col, TIME_COL_ALIASES, "event time") if time_col else None
     diet = add_time_window(diet_events, time_col=time_col, window=window)
     diet = diet[[id_col, "time_window", food_col, grams_col]].copy()
     diet[grams_col] = pd.to_numeric(diet[grams_col], errors="coerce").fillna(0)
     food_features = food_features.copy()
-    food_features[food_col] = food_features[food_col].astype(diet[food_col].dtype, copy=False)
     if feature_cols is None:
-        feature_cols = infer_feature_columns(food_features, exclude=[food_col])
-    merged = diet.merge(food_features[[food_col] + feature_cols], on=food_col, how="left")
+        feature_cols = infer_feature_columns(food_features, exclude=[ref_food_col])
+    diet["_food_join_id"] = diet[food_col].astype("string")
+    food_features["_food_join_id"] = food_features[ref_food_col].astype("string")
+    merged = diet.merge(food_features[["_food_join_id"] + feature_cols], on="_food_join_id", how="left")
     values = merged[feature_cols].apply(pd.to_numeric, errors="coerce").fillna(0)
     grams = merged[grams_col].to_numpy()[:, None]
     if amount_scaling == "per_100g":
@@ -132,6 +151,7 @@ def aggregate_embeddings(
     food_embeddings: pd.DataFrame,
     id_col: str = ID_COL_DEFAULT,
     food_col: str = FOOD_COL_DEFAULT,
+    ref_food_col: str = REF_FOOD_COL_DEFAULT,
     grams_col: str = GRAMS_COL_DEFAULT,
     time_col: str | None = TIME_COL_DEFAULT,
     window: str = "participant",
@@ -144,10 +164,11 @@ def aggregate_embeddings(
         raise ValueError(f"No embedding columns found with prefix {embedding_prefix!r}")
     out = aggregate_food_features(
         diet_events=diet_events,
-        food_features=food_embeddings[[food_col] + embedding_cols],
+        food_features=food_embeddings[[ref_food_col] + embedding_cols],
         feature_cols=embedding_cols,
         id_col=id_col,
         food_col=food_col,
+        ref_food_col=ref_food_col,
         grams_col=grams_col,
         time_col=time_col,
         window=window,
@@ -164,6 +185,7 @@ def build_design_matrix(
     feature_mode: str = "enriched",
     id_col: str = ID_COL_DEFAULT,
     food_col: str = FOOD_COL_DEFAULT,
+    ref_food_col: str = REF_FOOD_COL_DEFAULT,
     grams_col: str = GRAMS_COL_DEFAULT,
     time_col: str | None = TIME_COL_DEFAULT,
     window: str = "participant",
@@ -178,6 +200,7 @@ def build_design_matrix(
             ref,
             id_col=id_col,
             food_col=food_col,
+            ref_food_col=ref_food_col,
             grams_col=grams_col,
             time_col=time_col,
             window=window,
@@ -189,6 +212,7 @@ def build_design_matrix(
             feature_cols=feature_cols,
             id_col=id_col,
             food_col=food_col,
+            ref_food_col=ref_food_col,
             grams_col=grams_col,
             time_col=time_col,
             window=window,
@@ -211,4 +235,3 @@ def build_design_matrix(
     summary_path = Path(output_path).with_suffix(".summary.json")
     summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return summary
-

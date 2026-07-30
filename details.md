@@ -274,7 +274,7 @@ manually inspecting the table.
 Nutrient features are per-100 g food-reference values. Inside the TRE:
 
 ```text
-event_amount = reference_per_100g * grams_consumed / 100
+event_amount = reference_per_100g * weight_g / 100
 ```
 
 Product, chemical, metabolite, disease, and pathway features are currently

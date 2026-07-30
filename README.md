@@ -182,13 +182,19 @@ TRE-side preprocessing and prediction notebooks are in:
 downstream_analysis/
 ```
 
-The expected raw diet-event table has at least:
+The expected TRE diet-event table follows the legacy diet logging dictionary
+where possible:
 
 ```text
-participant_id | hpp_food_id | grams_consumed
+participant_id | food_id | weight_g
 ```
 
-and can optionally include a timestamp column. The notebooks support:
+and can optionally include `collection_timestamp`, `local_timestamp`, or
+`collection_date`. The preprocessing code also accepts older/local aliases
+(`hpp_food_id`, `grams_consumed`, and `timestamp`) and can join TRE `food_id`
+events to exported food-reference tables keyed by `hpp_food_id`.
+
+The notebooks support:
 
 - enriched per-100 g food features;
 - food-card embedding vectors;
@@ -216,5 +222,5 @@ Nutrient values are treated as per-100 g food-reference values. Inside the TRE,
 diet-event features should be assembled as:
 
 ```text
-event_amount = reference_per_100g * grams_consumed / 100
+event_amount = reference_per_100g * weight_g / 100
 ```

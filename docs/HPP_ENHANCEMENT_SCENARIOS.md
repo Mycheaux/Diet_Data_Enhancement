@@ -23,7 +23,7 @@ food-reference profiles can be joined to participant diet events and multiplied
 by consumed amount:
 
 ```text
-event_amount = reference_per_100g * grams_consumed / 100
+event_amount = reference_per_100g * weight_g / 100
 ```
 
 The resulting person-level diet matrices can support prediction of microbiome
