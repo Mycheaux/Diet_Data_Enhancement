@@ -1,4 +1,7 @@
+numpy
 pandas
+scipy
+scikit-learn
 openpyxl
 pyarrow
 openai
