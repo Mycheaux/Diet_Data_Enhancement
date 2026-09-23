@@ -1,0 +1,168 @@
+{
+  "hba1c": {
+    "phenobench_task": "hba1c",
+    "config_ready": true,
+    "diet_target_field": "bt__hba1c_float_value",
+    "target_dataset": "TRE blood tests",
+    "target_source": "HPP/TRE clinical laboratory table",
+    "clinical_name": "Hemoglobin A1c",
+    "valid_range": "TRE laboratory quality-control range; commonly interpreted as percent HbA1c",
+    "primary_metric": "R2 with RMSE and Pearson correlation as secondary metrics",
+    "why_this_matters": "HbA1c is a standard marker of longer-term glycemic exposure. Diet-derived features can test whether nutrient, food-chemical, metabolomic, and pathway-aware diet representations explain glycemic variation beyond simpler diet summaries.",
+    "caveats": "Diet features should be built from food logs preceding the blood draw. Medication, diabetes status, fasting state, assay differences, and time-window alignment can strongly affect interpretation."
+  },
+  "tg": {
+    "phenobench_task": "tg",
+    "config_ready": true,
+    "diet_target_field": "bt__triglycerides_float_value",
+    "target_dataset": "TRE blood tests",
+    "target_source": "HPP/TRE clinical laboratory table",
+    "clinical_name": "Triglycerides",
+    "valid_range": "TRE laboratory quality-control range; typically mg/dL or mmol/L depending on source normalization",
+    "primary_metric": "R2 with RMSE and Pearson correlation as secondary metrics",
+    "why_this_matters": "Triglycerides are diet-sensitive cardiometabolic biomarkers. Comparing de novo enriched diet features, NutriMatch nutrient features, and food-card embeddings can quantify whether extra chemical/metabolomic context improves prediction.",
+    "caveats": "Fasting status, alcohol, recent meals, medication, and blood-draw timing may dominate short-term triglyceride variation."
+  },
+  "ldl": {
+    "phenobench_task": "ldl",
+    "config_ready": true,
+    "diet_target_field": "bt__ldl_cholesterol_float_value",
+    "target_dataset": "TRE blood tests",
+    "target_source": "HPP/TRE clinical laboratory table",
+    "clinical_name": "LDL cholesterol",
+    "valid_range": "TRE laboratory quality-control range; typically mg/dL or mmol/L depending on source normalization",
+    "primary_metric": "R2 with RMSE and Pearson correlation as secondary metrics",
+    "why_this_matters": "LDL cholesterol is a major cardiovascular risk marker. The task tests whether enriched habitual diet representations capture lipid-related signal beyond nutrient-only baselines.",
+    "caveats": "Lipid-lowering medication, genetics, fasting status, and laboratory method should be considered when interpreting model performance."
+  },
+  "fpg": {
+    "phenobench_task": "fpg",
+    "config_ready": true,
+    "diet_target_field": "bt__glucose_float_value",
+    "target_dataset": "TRE blood tests",
+    "target_source": "HPP/TRE clinical laboratory table",
+    "clinical_name": "Fasting plasma glucose proxy",
+    "valid_range": "TRE laboratory quality-control range; only use as fasting plasma glucose when fasting metadata supports it",
+    "primary_metric": "R2 with RMSE and Pearson correlation as secondary metrics",
+    "why_this_matters": "Glucose is a proximal glycemic phenotype. Diet-enhanced representations can be evaluated against glucose when sample timing and fasting metadata are handled carefully.",
+    "caveats": "This mapping is only clinically equivalent to fasting plasma glucose when the blood draw is confirmed fasting. Otherwise label it as blood glucose rather than FPG."
+  },
+  "glyca": {
+    "phenobench_task": "glyca",
+    "config_ready": true,
+    "diet_target_field": "glyca_or_tre_equivalent",
+    "target_dataset": "TRE blood/metabolomics table when available",
+    "target_source": "Phenobench GlycA task loader",
+    "clinical_name": "GlycA inflammatory glycoprotein signal",
+    "valid_range": "Phenobench task quality-control range",
+    "primary_metric": "R2 with RMSE and Pearson correlation as secondary metrics",
+    "why_this_matters": "GlycA is an inflammation-related metabolic marker. It is a useful test for whether enriched diet chemistry and disease/pathway features carry inflammatory signal.",
+    "caveats": "Confirm the TRE field used by Phenobench and align diet windows before measurement."
+  },
+  "vat": {
+    "phenobench_task": "vat",
+    "config_ready": true,
+    "diet_target_field": "vat_or_tre_equivalent",
+    "target_dataset": "TRE imaging/body-composition table when available",
+    "target_source": "Phenobench VAT task loader",
+    "clinical_name": "Visceral adipose tissue",
+    "valid_range": "Phenobench task quality-control range",
+    "primary_metric": "R2 with RMSE and Pearson correlation as secondary metrics",
+    "why_this_matters": "VAT reflects cardiometabolic risk and long-term diet/metabolic state. It is useful for testing whether enriched diet representations capture body-composition signal.",
+    "caveats": "VAT is influenced by age, sex, activity, medication, and imaging protocol; diet-only models are expected to be incomplete."
+  },
+  "meal_ppgr": {
+    "phenobench_task": "meal_ppgr",
+    "config_ready": false,
+    "clinical_name": "Postprandial glucose response for individual meals",
+    "adapter_note": "Needs a meal-level adapter, not a participant-level embedding artifact. Candidate starting configs: configs/meal_ppgr.synthetic.yaml and configs/meal_ppgr.cgmacros.example.yaml.",
+    "why_this_matters": "This is the most direct test of whether enriched food-level features improve meal response prediction."
+  },
+  "meal_cgm_trajectory": {
+    "phenobench_task": "meal_cgm_trajectory",
+    "config_ready": false,
+    "clinical_name": "Full post-meal CGM trajectory",
+    "adapter_note": "Needs confirmation of Phenobench task contract and a meal-event feature artifact with time-aligned CGM labels.",
+    "why_this_matters": "Trajectory prediction can test whether chemical/metabolomic food information improves temporal glucose dynamics, not only scalar response."
+  },
+  "diet_sleep_causal_effect": {
+    "phenobench_task": "diet_sleep_causal_effect",
+    "config_ready": false,
+    "clinical_name": "Dietary exposure effect on subsequent sleep",
+    "adapter_note": "Needs exposure definition, causal window, and sleep outcome contract. Candidate starting config: configs/diet_sleep_causal_effect.synthetic.yaml.",
+    "why_this_matters": "This is a good downstream use case for food cards because interpretable dietary exposures can be tested against later sleep."
+  },
+  "post_meal_movement_priority": {
+    "phenobench_task": "post_meal_movement_priority",
+    "config_ready": false,
+    "clinical_name": "Meals where post-meal movement may be most useful",
+    "adapter_note": "Needs meal-level diet features, activity context, and intervention-priority label or utility definition.",
+    "why_this_matters": "This reframes diet enhancement as decision support rather than only biomarker prediction."
+  },
+  "gut_shannon_diversity": {
+    "phenobench_task": "gut_shannon_diversity",
+    "config_ready": false,
+    "clinical_name": "Gut microbiome Shannon diversity",
+    "adapter_note": "Needs confirmation of current Phenobench gut diversity task loader and target table. Candidate starting config: configs/gut_shannon_diversity_floor.synthetic.yaml.",
+    "why_this_matters": "This connects enriched diet features to microbiome diversity, one of the major planned TRE outcomes."
+  },
+  "gut_species_richness": {
+    "phenobench_task": "gut_species_richness",
+    "config_ready": false,
+    "clinical_name": "Gut microbiome species richness",
+    "adapter_note": "Needs confirmation of current Phenobench gut richness task loader and target table.",
+    "why_this_matters": "Richness complements Shannon diversity and may respond to habitual diet variety and food chemical exposures."
+  },
+  "prediabetes_type2_diabetes": {
+    "phenobench_task": null,
+    "config_ready": false,
+    "clinical_name": "Prediabetes and type 2 diabetes status",
+    "adapter_note": "Needs binary or multiclass disease-status task definition and Phenobench task implementation before config generation.",
+    "why_this_matters": "Clinically important glycemic outcomes for testing long-term diet-derived disease risk signal."
+  },
+  "tyg": {
+    "phenobench_task": null,
+    "config_ready": false,
+    "clinical_name": "Triglyceride-glucose index",
+    "adapter_note": "Can be derived from triglycerides and glucose if units/timing are harmonized; task card should define formula and exclusions.",
+    "why_this_matters": "TyG is a compact insulin-resistance proxy likely relevant to nutrient and food-processing features."
+  },
+  "waist": {
+    "phenobench_task": "waist",
+    "config_ready": true,
+    "diet_target_field": "waist_or_tre_equivalent",
+    "target_dataset": "TRE anthropometry table when available",
+    "target_source": "Phenobench waist task loader",
+    "clinical_name": "Waist circumference",
+    "valid_range": "Phenobench task quality-control range",
+    "primary_metric": "R2 with RMSE and Pearson correlation as secondary metrics",
+    "why_this_matters": "Waist circumference is an interpretable cardiometabolic body-size marker that can be compared with VAT and obesity outcomes.",
+    "caveats": "Diet-only prediction may be strongly confounded by age, sex, physical activity, and total energy balance."
+  },
+  "waist_hip_ratio": {
+    "phenobench_task": "waist_hip_ratio",
+    "config_ready": true,
+    "diet_target_field": "waist_hip_ratio_or_tre_equivalent",
+    "target_dataset": "TRE anthropometry table when available",
+    "target_source": "Phenobench waist-hip-ratio task loader",
+    "clinical_name": "Waist-to-hip ratio",
+    "valid_range": "Phenobench task quality-control range",
+    "primary_metric": "R2 with RMSE and Pearson correlation as secondary metrics",
+    "why_this_matters": "Waist-to-hip ratio captures fat distribution and is a useful adjacent metabolic outcome for habitual diet representation evaluation.",
+    "caveats": "Anthropometric measurement protocol and confounders should be handled explicitly."
+  },
+  "fatty_liver_liver_attenuation": {
+    "phenobench_task": null,
+    "config_ready": false,
+    "clinical_name": "Fatty liver status and liver attenuation",
+    "adapter_note": "Needs exact Phenobench task mapping. Existing adjacent tasks may include FLI/FIB tasks, but imaging liver attenuation is a separate target if available.",
+    "why_this_matters": "Fatty liver outcomes are mechanistically close to diet quality, triglycerides, glucose, and inflammatory pathways."
+  },
+  "irritable_bowel_syndrome": {
+    "phenobench_task": null,
+    "config_ready": false,
+    "clinical_name": "Irritable bowel syndrome",
+    "adapter_note": "Needs phenotype definition and classification task implementation before config generation.",
+    "why_this_matters": "IBS is a plausible target for food-card and microbiome-linked diet representations, but requires careful case/control definition."
+  }
+}

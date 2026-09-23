@@ -14,6 +14,12 @@ outputs/**
 !outputs/**/
 !outputs/**/.gitkeep
 
+# Generation 2 artifacts follow the same data policy as Generation 1.
+outputs_GEN2/**
+!outputs_GEN2/
+!outputs_GEN2/**/
+!outputs_GEN2/**/.gitkeep
+
 # Local smoke-test outputs from TRE-side notebooks/modules.
 downstream_analysis/test_outputs/
 downstream_analysis/outputs/

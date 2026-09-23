@@ -14,6 +14,9 @@ It does not require participant data outside TRE.
 - `utils/modeling.py`: aligns `X` and `Y`, runs five repeated 80/20 train-test splits,
   trains simple scikit-learn models, and reports classification or regression
   metrics.
+- `phenobench_adapter/`: exports participant-level diet feature matrices as
+  PhenoBench `participant_embedding` artifacts. This is the only folder here
+  that depends on the PhenoBench-TRE handoff contract.
 - `tasks/microbiome_prediction/`: task-specific workflow comparing full
   KG/downstream features, de novo enriched features, NutriMatch-only nutrient
   features, and food-card embedding features for microbiome targets.
@@ -71,4 +74,15 @@ CVD and cardiometabolic biomarker prediction:
 python -m downstream_analysis.tasks.cvd.cvd_prediction \
   --config downstream_analysis/tasks/cvd/example_config.json \
   --project-root .
+```
+
+Phenobench adapter export:
+
+```bash
+python -m downstream_analysis.phenobench_adapter.phenobench_adapter build \
+  --x-path downstream_analysis/test_outputs/cvd/full_data/X_full_data_30d.parquet \
+  --output-dir outputs/phenobench_adapter/denovo_full_data \
+  --feature-set-name denovo_full_data \
+  --participant-policy mean \
+  --adapter-mode artifact_only
 ```

@@ -1,0 +1,42 @@
+[
+  {
+    "hpp_food_id": "1007294",
+    "panel_label": "Espresso",
+    "food_group": "coffee",
+    "expected_product_name": "Espresso",
+    "selection_reason": "Most frequently logged coffee example; distinct preparation.",
+    "review_note": "Check espresso versus generic coffee and product matches."
+  },
+  {
+    "hpp_food_id": "1009997",
+    "panel_label": "Cooked spinach",
+    "food_group": "leafy_vegetable",
+    "expected_product_name": "Fresh cooked spinach",
+    "selection_reason": "Frequently logged cooked spinach without added oil in the product name.",
+    "review_note": "Product says spinach, but simplified and canonical names say Chard; review original identity before donor selection."
+  },
+  {
+    "hpp_food_id": "1013314",
+    "panel_label": "Turkey pastrami",
+    "food_group": "processed_meat",
+    "expected_product_name": "Turkey pastrami sausage",
+    "selection_reason": "Frequently logged processed meat with a specified animal source.",
+    "review_note": "Preserve turkey and processing information when comparing donors."
+  },
+  {
+    "hpp_food_id": "1011816",
+    "panel_label": "Whole-wheat sourdough",
+    "food_group": "whole_grain_bread",
+    "expected_product_name": "Whole wheat sourdough bread and cereals",
+    "selection_reason": "Explicit whole-wheat and sourdough description; brown bread alone is ambiguous.",
+    "review_note": "Check grain composition and fermentation rather than relying only on Wholemeal Bread."
+  },
+  {
+    "hpp_food_id": "1009118",
+    "panel_label": "Yogurt, 3% fat",
+    "food_group": "fermented_dairy",
+    "expected_product_name": "Bio yogurt 3% fat",
+    "selection_reason": "Frequently logged natural-yogurt example with specified fat percentage.",
+    "review_note": "Check fat percentage and sweetening; fermentation does not establish strain-specific probiotic content."
+  }
+]

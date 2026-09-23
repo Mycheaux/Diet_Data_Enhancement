@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "run_id": "20260901T184846Z-6e01d975",
+  "timestamp_utc": "2026-09-01T18:48:47Z",
+  "status": "success",
+  "task": {
+    "name": "fpg",
+    "target_name": "fpg",
+    "eval_split": "test",
+    "cohort_spec": "full",
+    "cohort_id": "f06d4b730d8e8ef922097799185d039847d8e18de72f59e1d26898e9d801a068",
+    "cohort_n": 200,
+    "participant_id_count": 200,
+    "split_unit_id_count": null,
+    "n_train": 135,
+    "n_validation": 30,
+    "n_test": 35,
+    "evaluation_unit_id_column": null,
+    "evaluation_unit_id_count": null,
+    "evaluation_unit": null,
+    "temporal": null
+  },
+  "predictor": {
+    "name": "participant_embedding"
+  },
+  "strategy": {
+    "name": "ridge_cv"
+  },
+  "primary_metric": {
+    "name": "r2",
+    "value": 0.195805138853826
+  },
+  "validation_tier": null,
+  "artifacts": [
+    {
+      "role": "predictor",
+      "path": "outputs/phenobench_adapter/phenobench_side_smoke/participant_embedding/nitrate_synthetic.participant_embedding.parquet",
+      "sha256": null,
+      "verification_status": null,
+      "verification_name": null,
+      "s3_bucket": null,
+      "s3_key": null
+    }
+  ]
+}

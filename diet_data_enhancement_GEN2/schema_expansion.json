@@ -1,0 +1,72 @@
+{
+  "review_method": "Assistant interpretation of original food descriptions in this conversation; no external model call or learned rubric.",
+  "unknown_category": "not_stated",
+  "features": [
+    {
+      "feature_name": "identity_food_family",
+      "display_name": "Food family from original description",
+      "definition": "Broad identity family, not a full ingredient list or a nutritional effect.",
+      "allowed_values": ["coffee_beverage", "leafy_vegetable", "poultry_product", "grain_bread", "yogurt"]
+    },
+    {
+      "feature_name": "identity_preparation_evidence",
+      "display_name": "Preparation named by food identity",
+      "definition": "Preparation supported by the named food, without borrowing the donor's boiling, draining, salt, or brand assumptions.",
+      "allowed_values": ["espresso_extraction_named", "cooked_method_unspecified", "pastrami_named", "sourdough_bread_named", "yogurt_named"]
+    },
+    {
+      "feature_name": "identity_fermentation_evidence",
+      "display_name": "Fermentation evidence in food identity",
+      "definition": "Named sourdough or yogurt identity; does not establish live microbes, strain, dose, duration, or unfermented status for other foods.",
+      "allowed_values": ["sourdough_named", "yogurt_named", "not_stated"]
+    },
+    {
+      "feature_name": "identity_grain_refinement_evidence",
+      "display_name": "Grain refinement evidence in food identity",
+      "definition": "Explicit whole-wheat wording only; absence of wording is unknown, not refined grain or absence of grain.",
+      "allowed_values": ["whole_wheat_named", "not_stated"]
+    }
+  ],
+  "foods": [
+    {
+      "hpp_food_id": "1007294",
+      "expected_product_name": "Espresso",
+      "identity_food_family": "coffee_beverage",
+      "identity_preparation_evidence": "espresso_extraction_named",
+      "identity_fermentation_evidence": "not_stated",
+      "identity_grain_refinement_evidence": "not_stated"
+    },
+    {
+      "hpp_food_id": "1009997",
+      "expected_product_name": "Fresh cooked spinach",
+      "identity_food_family": "leafy_vegetable",
+      "identity_preparation_evidence": "cooked_method_unspecified",
+      "identity_fermentation_evidence": "not_stated",
+      "identity_grain_refinement_evidence": "not_stated"
+    },
+    {
+      "hpp_food_id": "1013314",
+      "expected_product_name": "Turkey pastrami sausage",
+      "identity_food_family": "poultry_product",
+      "identity_preparation_evidence": "pastrami_named",
+      "identity_fermentation_evidence": "not_stated",
+      "identity_grain_refinement_evidence": "not_stated"
+    },
+    {
+      "hpp_food_id": "1011816",
+      "expected_product_name": "Whole wheat sourdough bread and cereals",
+      "identity_food_family": "grain_bread",
+      "identity_preparation_evidence": "sourdough_bread_named",
+      "identity_fermentation_evidence": "sourdough_named",
+      "identity_grain_refinement_evidence": "whole_wheat_named"
+    },
+    {
+      "hpp_food_id": "1009118",
+      "expected_product_name": "Bio yogurt 3% fat",
+      "identity_food_family": "yogurt",
+      "identity_preparation_evidence": "yogurt_named",
+      "identity_fermentation_evidence": "yogurt_named",
+      "identity_grain_refinement_evidence": "not_stated"
+    }
+  ]
+}
