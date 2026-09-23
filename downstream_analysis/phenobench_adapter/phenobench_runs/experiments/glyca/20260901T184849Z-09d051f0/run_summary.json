@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "run_id": "20260901T184849Z-09d051f0",
+  "timestamp_utc": "2026-09-01T18:48:50Z",
+  "status": "success",
+  "task": {
+    "name": "glyca",
+    "target_name": "glyca",
+    "eval_split": "test",
+    "cohort_spec": "full",
+    "cohort_id": "f5c74665e28b82de359596ad50f30b3df28a5b29c8b8942cec51d817fa238f9f",
+    "cohort_n": 198,
+    "participant_id_count": 198,
+    "split_unit_id_count": null,
+    "n_train": 134,
+    "n_validation": 30,
+    "n_test": 34,
+    "evaluation_unit_id_column": null,
+    "evaluation_unit_id_count": null,
+    "evaluation_unit": null,
+    "temporal": null
+  },
+  "predictor": {
+    "name": "participant_embedding"
+  },
+  "strategy": {
+    "name": "ridge_cv"
+  },
+  "primary_metric": {
+    "name": "r2",
+    "value": 0.013522105253771288
+  },
+  "validation_tier": null,
+  "artifacts": [
+    {
+      "role": "predictor",
+      "path": "outputs/phenobench_adapter/phenobench_side_smoke/participant_embedding/nitrate_synthetic.participant_embedding.parquet",
+      "sha256": null,
+      "verification_status": null,
+      "verification_name": null,
+      "s3_bucket": null,
+      "s3_key": null
+    }
+  ]
+}

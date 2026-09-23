@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "run": {
+    "run_id": "20260901T184849Z-09d051f0",
+    "timestamp_utc": "2026-09-01T18:48:50Z",
+    "framework_version": "0+unknown",
+    "git_sha": "e1702b109196dcfdb6f7955a748c4172e7d257a4",
+    "git_dirty": false,
+    "eval_mode": "representation",
+    "atomic_unit_id": "b7646c4d5e96",
+    "task_id": "glyca:bd5691f5",
+    "predictor_id": "participant_embedding:aa098925",
+    "strategy_id": "ridge_cv:07a170cd"
+  },
+  "task": {
+    "name": "glyca",
+    "class_path": "phenobench.tasks.glyca.GlycaTask",
+    "kwargs_provided": {
+      "loader_mode": "synthetic"
+    },
+    "kwargs_defaults": {
+      "n_synthetic": 200,
+      "research_stage": "00_00_visit",
+      "valid_range": [
+        0.5,
+        3.0
+      ],
+      "demographic_features": [
+        "age",
+        "sex",
+        "bmi"
+      ],
+      "blacklist_participants": null,
+      "cache_s3": null,
+      "seed": 42,
+      "eval_split": "test",
+      "cohort_spec": "full",
+      "split_source": "canonical",
+      "target_source": null
+    },
+    "target_shape": "continuous-scalar",
+    "target_name": "glyca",
+    "covariate_names": [
+      "age",
+      "sex",
+      "bmi"
+    ],
+    "splitter_version": "v1",
+    "blacklist_hash": null,
+    "cohort_spec_version": null,
+    "eval_split": "test",
+    "cohort_spec": "full",
+    "cohort_id": "f5c74665e28b82de359596ad50f30b3df28a5b29c8b8942cec51d817fa238f9f",
+    "cohort_n": 198,
+    "participant_id_count": 198,
+    "split_unit_id_count": null,
+    "n_train": 134,
+    "n_validation": 30,
+    "n_test": 34,
+    "eval_category": "probing",
+    "input_channel": "participant_ids",
+    "evaluation_unit_id_column": null,
+    "evaluation_unit_id_count": null,
+    "audit_metadata": {}
+  },
+  "predictor": {
+    "name": "participant_embedding",
+    "class_path": "phenobench.predictors.participant_embedding.ParticipantEmbeddingPredictor",
+    "kwargs_provided": {
+      "artifact_path": "outputs/phenobench_adapter/phenobench_side_smoke/participant_embedding/nitrate_synthetic.participant_embedding.parquet",
+      "embedding_dim": 8,
+      "view_slice": "concat"
+    },
+    "kwargs_defaults": {},
+    "weights_hash": null,
+    "output_schema": {
+      "n_features": 8,
+      "participant_id_count": 200,
+      "provenance_columns": [
+        "split"
+      ]
+    },
+    "model_id": "participant_embedding",
+    "output_channel": "embeddings"
+  },
+  "strategy": {
+    "name": "ridge_cv",
+    "class_path": "phenobench.strategies.ridge_cv.RidgeCVStrategy",
+    "kwargs_provided": {
+      "alphas": [
+        0.01,
+        0.1,
+        1.0,
+        10.0,
+        100.0
+      ],
+      "fit_intercept": true,
+      "cv": 5,
+      "seed": 42,
+      "scaler": "standard"
+    },
+    "kwargs_defaults": {},
+    "accepted_target_shapes": [
+      "continuous-scalar"
+    ],
+    "metadata": {
+      "coef": [
+        0.01591030941364178,
+        -0.0009193637915639885,
+        -0.008709671225670484,
+        -0.01704088038358915,
+        0.011863318674622418,
+        -0.0006709876950149837,
+        -0.010336818560504588,
+        0.003524819420485139,
+        0.004636590974442179,
+        0.036359337899752125,
+        0.006897016314228358
+      ],
+      "intercept": 0.45266659452878333,
+      "alpha_selected": 10.0,
+      "alphas_grid": [
+        0.01,
+        0.1,
+        1.0,
+        10.0,
+        100.0
+      ],
+      "cv": 5,
+      "seed": 42,
+      "covariate_train_medians": [
+        51.25317616200194,
+        0.0,
+        26.18643793305376
+      ]
+    }
+  },
+  "metrics": {
+    "primary_metric_name": "r2",
+    "primary_metric_value": 0.013522105253771288,
+    "metrics": {
+      "r2": 0.013522105253771288,
+      "rmse": 0.1524627711765233,
+      "mae": 0.12041450830078056,
+      "n_eval": 34.0,
+      "n_train": 134.0,
+      "n_validation": 30.0,
+      "n_test": 34.0,
+      "pearson_r": 0.2575494508301054,
+      "pearson_p": 0.14141984050682532
+    },
+    "extras": {}
+  },
+  "predictions": {
+    "persisted": true,
+    "path": "predictions.parquet",
+    "format": "parquet",
+    "sha256": "8a0c0309110b554b07fd4bbdc2c517b324e0644d2f21644b457197e7660eba46"
+  },
+  "artifacts": [
+    {
+      "role": "predictor",
+      "path": "outputs/phenobench_adapter/phenobench_side_smoke/participant_embedding/nitrate_synthetic.participant_embedding.parquet",
+      "sha256": null,
+      "verification": null,
+      "s3": null,
+      "metadata": {
+        "embedding_dim": 8,
+        "view_slice": "concat"
+      }
+    }
+  ],
+  "validation_tier": null,
+  "status": "success",
+  "error_type": null,
+  "error_message": null
+}

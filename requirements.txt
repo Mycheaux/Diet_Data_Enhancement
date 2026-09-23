@@ -6,3 +6,5 @@ openpyxl
 pyarrow
 openai
 plotly
+matplotlib
+seaborn

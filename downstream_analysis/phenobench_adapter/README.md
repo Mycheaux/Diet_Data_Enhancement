@@ -44,6 +44,9 @@ participant_id | embedding
 ```
 
 where `embedding` is a numeric vector made from the selected diet features.
+Common TRE metadata columns such as cohort, research stage, sample/run ids,
+array index, timestamps, dates, windows, and split labels are excluded from the
+numeric embedding.
 
 ## Recommended Two-Phase Workflow
 
@@ -85,29 +88,79 @@ after reviewing the generated drafts against the generic `outside_tre/` flow.
 
 ### Phase B: Inside TRE
 
-Run only deterministic code on private data. For example:
+Run only deterministic code on private data. The example below assumes this
+repo and `phenobench-tre` have both been uploaded to TRE:
+
+```bash
+export DIET_REPO=/tre/path/to/Diet_Data_enhancement
+export PHENOBENCH_REPO=/tre/path/to/phenobench-tre
+cd "$DIET_REPO"
+```
+
+First prepare local HPP/TRE inputs with `PhenoLoader`:
+
+```bash
+python -m downstream_analysis.data_handelling.pheno_loader_export prepare-task-inputs \
+  --tasks cvd \
+  --output-dir tre_inputs
+```
+
+Then build the Diet Data Enhancement participant-level feature tables. This
+also runs the local downstream CVD comparison, but the file Phenobench needs is
+the `X_*.parquet` feature table:
+
+```bash
+python -m downstream_analysis.tasks.cvd.cvd_prediction \
+  --config downstream_analysis/tasks/cvd/example_config.json \
+  --project-root "$DIET_REPO"
+```
+
+With the default CVD config, the full KG/downstream diet feature table is:
+
+```text
+downstream_analysis/tasks/cvd/outputs/full_data/X_full_data_participant.parquet
+```
+
+Convert that participant-level diet table into Phenobench's
+`participant_embedding` artifact and generate runnable Phenobench configs:
 
 ```bash
 python -m downstream_analysis.phenobench_adapter.phenobench_adapter build \
-  --x-path downstream_analysis/test_outputs/cvd/full_data/X_full_data_30d.parquet \
-  --output-dir outputs/phenobench_adapter/denovo_full_data \
-  --feature-set-name denovo_full_data \
+  --x-path "$DIET_REPO/downstream_analysis/tasks/cvd/outputs/full_data/X_full_data_participant.parquet" \
+  --output-dir "$DIET_REPO/outputs/phenobench_adapter/full_data" \
+  --feature-set-name full_data \
   --participant-policy mean \
-  --adapter-mode artifact_only
+  --adapter-mode tre_minimal
 ```
 
-`artifact_only` writes only:
+`tre_minimal` writes:
 
 ```text
 participant_embedding/
+phenobench_configs/
 phenobench_adapter_manifest.json
 ```
 
-Then run a reviewed config from `phenobench-tre/inside_tre` that points to the
-artifact path written above:
+Then run a generated config with the Phenobench code. The config uses the
+standard Phenobench `participant_embedding` predictor and points to the artifact
+written by the adapter:
 
 ```bash
-python -m phenobench run /path/to/phenobench_configs/hba1c_denovo_full_data_ridge_cv.yaml
+PYTHONPATH="$PHENOBENCH_REPO:$DIET_REPO" \
+python -m phenobench run \
+  "$DIET_REPO/outputs/phenobench_adapter/full_data/phenobench_configs/hba1c_full_data_ridge_cv.yaml"
+```
+
+Repeat the final command for:
+
+```text
+tg_full_data_ridge_cv.yaml
+ldl_full_data_ridge_cv.yaml
+fpg_full_data_ridge_cv.yaml
+glyca_full_data_ridge_cv.yaml
+vat_full_data_ridge_cv.yaml
+waist_full_data_ridge_cv.yaml
+waist_hip_ratio_full_data_ridge_cv.yaml
 ```
 
 Inside TRE, `phenobench-tre` should be available as an offline checkout or

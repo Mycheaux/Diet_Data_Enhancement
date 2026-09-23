@@ -1,0 +1,5 @@
+sentence-transformers==5.1.0
+transformers==4.56.2
+torch==2.8.0
+pandas==2.3.2
+matplotlib==3.10.6

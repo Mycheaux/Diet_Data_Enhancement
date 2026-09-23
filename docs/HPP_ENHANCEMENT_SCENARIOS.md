@@ -15,6 +15,10 @@ The hybrid scenario is retained as an optional design branch, but because it is
 currently identical to de novo for all available values, it is not the main
 comparison branch.
 
+For next-generation design notes on true dose-valued chemical features,
+pathway exposure scores, independent de novo nutrient testing, and a stronger
+LLM adjudication layer, see [GEN2_PLAN_NOTES.md](GEN2_PLAN_NOTES.md).
+
 ## Scientific Goal
 
 The goal is to enrich HPP diet records so that each logged food can be expanded

@@ -1,0 +1,58 @@
+{
+  "status": "assistant_reviewed_prototype_not_embedding_validated",
+  "review_method": "Food identities and public-source descriptions reviewed in the current Codex conversation; decisions saved for deterministic replay.",
+  "embedding_model": null,
+  "adjudication_api_model": null,
+  "model_version_note": "No external model call was made. Do not label this as a pinned Astra/API or vector-retrieval run.",
+  "schema_note": "A first nutrient module covering macronutrients, minerals, vitamins, amino acids and fatty acids, selected from public USDA nutrient IDs independently of Gen1. Additional source nutrients remain in the candidate catalog and evidence table; this is not the final all-feature schema.",
+  "nutrient_ids": [1003,1004,1005,1007,1008,1018,1051,1057,1058,1079,1087,1089,1090,1091,1092,1093,1095,1098,1101,1103,1105,1106,1107,1108,1109,1114,1120,1122,1123,1162,1165,1166,1167,1170,1175,1177,1178,1180,1185,1186,1187,1190,1253,1258,1268,1269,1270,1272,1278,1280,1292,1293,2000,1210,1211,1212,1213,1214,1215,1216,1217,1218,1219,1220,1221,1222,1223,1224,1225,1226,1227],
+  "foods": [
+    {
+      "hpp_food_id": "1007294",
+      "expected_product_name": "Espresso",
+      "panel_label": "Espresso",
+      "primary_fdc_id": 171891,
+      "expected_donor_name": "Beverages, coffee, brewed, espresso, restaurant-prepared",
+      "match_basis": "Original Hebrew and English labels both specify espresso; choose caffeinated espresso, not decaf or a dry powder.",
+      "uncertainty": "Restaurant-prepared generic espresso may differ in extraction and dilution from the logged drink.",
+      "amino_acid_proxy_fdc_id": 171890,
+      "amino_acid_proxy_reason": "Espresso donor lacks amino-acid measurements. Use the amino-acid-to-protein profile of brewed caffeinated coffee, scaled to the espresso donor protein. This is an unvalidated composition estimate, not direct espresso evidence."
+    },
+    {
+      "hpp_food_id": "1009997",
+      "expected_product_name": "Fresh cooked spinach",
+      "panel_label": "Cooked spinach",
+      "primary_fdc_id": 168463,
+      "expected_donor_name": "Spinach, cooked, boiled, drained, without salt",
+      "match_basis": "Original Hebrew says cooked spinach. Preserve spinach identity and cooked state; no chard or raw-vegetable substitution.",
+      "uncertainty": "Boiling, draining and absence of added salt are explicit proxy assumptions; original description only establishes cooked fresh spinach."
+    },
+    {
+      "hpp_food_id": "1013314",
+      "expected_product_name": "Turkey pastrami sausage",
+      "panel_label": "Turkey pastrami",
+      "primary_fdc_id": 172927,
+      "expected_donor_name": "Pastrami, turkey",
+      "match_basis": "Match turkey and cured pastrami processing, excluding beef pastrami.",
+      "uncertainty": "Brand, brine, sodium concentration and recipe are unknown; a generic donor is an approximation."
+    },
+    {
+      "hpp_food_id": "1011816",
+      "expected_product_name": "Whole wheat sourdough bread and cereals",
+      "panel_label": "Whole-wheat sourdough",
+      "primary_fdc_id": 172690,
+      "expected_donor_name": "Bread, whole-wheat, prepared from recipe",
+      "match_basis": "Use a whole-wheat bread proxy. The public donor does not establish the sourdough fermentation or cereal mixture.",
+      "uncertainty": "Approximate donor only. Sourdough-specific composition and fermentation features require further evidence."
+    },
+    {
+      "hpp_food_id": "1009118",
+      "expected_product_name": "Bio yogurt 3% fat",
+      "panel_label": "Yogurt, 3% fat",
+      "primary_fdc_id": 171284,
+      "expected_donor_name": "Yogurt, plain, whole milk",
+      "match_basis": "Use whole-milk dairy yogurt close to the stated fat percentage; reject tofu yogurt and skim milk yogurt.",
+      "uncertainty": "Generic donor contains 3.25 g fat per 100 g, versus 3% in the target label. Do not call it an exact branded match."
+    }
+  ]
+}

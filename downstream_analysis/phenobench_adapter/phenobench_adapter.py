@@ -26,11 +26,17 @@ NON_FEATURE_COLUMNS = {
     "ParticipantId",
     "participant",
     "person_id",
+    "cohort",
+    "research_stage",
     "time_window",
     "window_id",
+    "array_index",
     "timestamp",
     "collection_timestamp",
     "collection_date",
+    "sample_name",
+    "run_name",
+    "wgs_dna_code",
     "split",
 }
 
